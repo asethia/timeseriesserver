@@ -2,11 +2,13 @@ package server
 
 import java.net.InetSocketAddress
 
+import java.net.InetSocketAddress
+
 import akka.actor.ActorSystem
-import akka.io.IO
-import akka.io.Tcp.Bind
-import akka.stream.scaladsl.Tcp
+import akka.io.Tcp._
+import akka.io.{IO, Tcp}
 import com.typesafe.config.ConfigFactory
+
 import handler.TCPHandler
 
 
