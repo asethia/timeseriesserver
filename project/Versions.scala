@@ -1,7 +1,6 @@
 object Versions {
-
-  val Scala          = "2.11.6"
-  val akkaV = "2.3.11"
-  val akkaStreamV = "2.0.3"
-
+  val scalaV = "2.11"
+  val akkaV = "2.4.7"
+  val akkaStreamV = "2.0.4"
+  val cassandraDriverV ="3.0.0"
 }

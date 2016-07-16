@@ -4,7 +4,7 @@ version := "1.0"
 
 assemblyJarName in assembly := "timeseriesserver.jar"
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Dependencies.basicDeps
 
