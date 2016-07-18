@@ -11,10 +11,10 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LogEntry}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
-import org.slf4j.Logger
+import com.typesafe.scalalogging.Logger
 
-import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.{Await, ExecutionContext}
 import scala.util.control.NonFatal
 
 
@@ -27,23 +27,27 @@ class TimeHttpServer(port: Int = 8080, handler: Flow[HttpRequest, HttpResponse, 
                     (implicit logger: Logger, system: ActorSystem, materializer: ActorMaterializer) {
 
   private val httpAddress = "0.0.0.0"
-  implicit val ec:ExecutionContext=system.dispatcher
+  implicit val ec: ExecutionContext = system.dispatcher
 
   def run = {
-    Http().bindAndHandle(handler, httpAddress, port).map(shutDownProcess)
+    Http().bindAndHandle(handler, httpAddress, port).map(shutDownHook)
   }
 
-  def shutDownProcess(serverBinding: ServerBinding)(implicit system: ActorSystem, materializer: ActorMaterializer) = {
-    logger.info("Shutdown - starting to unbind HTTP server")
-    val unbindFuture = serverBinding.unbind()
-    try {
-      val t = Await.result(unbindFuture, FiniteDuration(2, TimeUnit.SECONDS))
-      logger.info("HTTP server unbound successfully")
-    } catch {
-      case NonFatal(e) => logger.error(s"Unbinding HTTP server failed: ${e.getMessage}", e)
-    }
-    materializer.shutdown()
-    system.terminate()
+  def shutDownHook(implicit system: ActorSystem, materializer: ActorMaterializer)
+  : PartialFunction[ServerBinding, Unit] = {
+    case serverBinding =>
+      sys.addShutdownHook {
+        logger.info("Shutdown - starting to unbind HTTP server")
+        val unbindFuture = serverBinding.unbind()
+        try {
+          val t = Await.result(unbindFuture, FiniteDuration(2, TimeUnit.SECONDS))
+          logger.info("HTTP server unbound successfully")
+        } catch {
+          case NonFatal(e) => logger.error(s"Unbinding HTTP server failed: ${e.getMessage}", e)
+        }
+        materializer.shutdown()
+        system.terminate()
+      }
   }
 }
 
@@ -52,7 +56,7 @@ class TimeHttpServer(port: Int = 8080, handler: Flow[HttpRequest, HttpResponse, 
   */
 object TimeHttpServer {
   def apply(port: Int, handler: Route)
-           (implicit logger: Logger,system: ActorSystem, materializer: ActorMaterializer) = {
+           (implicit logger: Logger, system: ActorSystem, materializer: ActorMaterializer) = {
 
     val routeWithLogging = DebuggingDirectives.
       logRequestResult(TimeHttpServer.requestMethodAndResponseStatusAsInfo _)(handler)
