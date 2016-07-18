@@ -6,6 +6,8 @@ assemblyJarName in assembly := "timeseriesserver.jar"
 
 scalaVersion := "2.11.7"
 
+ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
+
 libraryDependencies ++= Dependencies.basicDeps
 
 assemblyMergeStrategy in assembly :={
@@ -16,6 +18,7 @@ assemblyMergeStrategy in assembly :={
   case PathList (ps @ _ *) if ps. last endsWith ".jnilib" => MergeStrategy. first
   case PathList (ps @ _ *) if ps. last endsWith ".dll" => MergeStrategy. first
   case PathList (ps @ _ *) if ps. last endsWith ".class" => MergeStrategy. first
+  case PathList("akka", "stream", xs@_*) => MergeStrategy.first
   case "application.conf" => MergeStrategy. concat
   case "unwanted.txt" => MergeStrategy. discard
   case x =>
