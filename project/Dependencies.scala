@@ -3,7 +3,6 @@ import sbt._
 
 object Dependencies {
 
-  val akkaStream = "com.typesafe.akka" %% "akka-stream-experimental" % akkaStreamV
 
   val akkaHttpSprayJson = "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV
 
@@ -13,6 +12,8 @@ object Dependencies {
 
   val cassandraDriver ="com.datastax.cassandra"  % "cassandra-driver-core" % cassandraDriverV exclude("org.xerial.snappy", "snappy-java")
 
-  val basicDeps = Seq(akkaStream,akkaHttpSprayJson, akkaActor,akkaSlf4j,cassandraDriver)
+  val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % scalaLogV
+
+  val basicDeps = Seq(akkaHttpSprayJson, akkaActor,akkaSlf4j,cassandraDriver,scalaLogging)
 
 }
