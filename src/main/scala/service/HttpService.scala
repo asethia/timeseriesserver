@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Directives
   * Created by Arun Sethia on 16/07/16.
   */
 trait HttpService extends Directives  {
-  val route = {
+  val serviceRoute = {
     get {
       pathPrefix("metrics") {
         path(("hour" | "min" | "sec") / Segment / Segment) { (metric, value) =>
