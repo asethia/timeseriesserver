@@ -1,6 +1,6 @@
 package handler
 
-import akka.actor.{Props, Actor}
+import akka.actor.{ActorLogging, Props, Actor}
 import akka.io.Tcp.{Write, Received, PeerClosed}
 import akka.util.ByteString
 
@@ -16,12 +16,14 @@ object MessageHandlerActor{
   *
   * Created by Arun Sethia on 27/05/16.
   */
-class MessageHandlerActor extends Actor{
+class MessageHandlerActor extends Actor with ActorLogging{
   def receive:Receive={
-    case str:String=>println(s"Message received $str")
+    case str:String=>{
+      log.info(s"Message received $str")
+    }
     case Received(data) => {
       val in=data.decodeString("UTF-8")
-      println(s"Message received $in")
+      log.info(s"Message received $in")
       sender() ! Write(ByteString("ok"))
     }
     case PeerClosed     => context stop self
