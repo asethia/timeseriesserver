@@ -15,6 +15,7 @@ import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Await, ExecutionContext}
+import scala.util.Try
 import scala.util.control.NonFatal
 
 
@@ -37,14 +38,8 @@ class TimeHttpServer(port: Int = 8080, handler: Flow[HttpRequest, HttpResponse, 
   : PartialFunction[ServerBinding, Unit] = {
     case serverBinding =>
       sys.addShutdownHook {
-        logger.info("Shutdown - starting to unbind HTTP server")
         val unbindFuture = serverBinding.unbind()
-        try {
-          val t = Await.result(unbindFuture, FiniteDuration(2, TimeUnit.SECONDS))
-          logger.info("HTTP server unbound successfully")
-        } catch {
-          case NonFatal(e) => logger.error(s"Unbinding HTTP server failed: ${e.getMessage}", e)
-        }
+        Try{Await.result(unbindFuture, FiniteDuration(2, TimeUnit.SECONDS))}
         materializer.shutdown()
         system.terminate()
       }
@@ -52,7 +47,8 @@ class TimeHttpServer(port: Int = 8080, handler: Flow[HttpRequest, HttpResponse, 
 }
 
 /**
-  * this is http server factory object
+  * This is companion object for HTTP Server
+  * to create HTTP Object
   */
 object TimeHttpServer {
   def apply(port: Int, handler: Route)
