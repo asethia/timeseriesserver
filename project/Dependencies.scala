@@ -14,6 +14,10 @@ object Dependencies {
 
   val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % scalaLogV
 
-  val basicDeps = Seq(akkaHttpSprayJson, akkaActor,akkaSlf4j,cassandraDriver,scalaLogging)
+  val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % akkaV % "test"
+
+  val scalatest = "org.scalatest" %% "scalatest" % scalaTestV % "test"
+
+  val basicDeps = Seq(akkaHttpSprayJson, akkaActor,akkaSlf4j,cassandraDriver,scalaLogging,akkaTestKit,scalatest)
 
 }
