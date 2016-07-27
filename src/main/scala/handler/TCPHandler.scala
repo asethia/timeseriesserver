@@ -1,6 +1,6 @@
 package handler
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ActorLogging, Actor, Props}
 import akka.io.Tcp._
 import akka.routing.FromConfig
 
@@ -16,22 +16,22 @@ import akka.routing.FromConfig
   */
 object TCPHandler{
   def props=Props(classOf[TCPHandlerActor])
+  val ConnectedMsg: String ="connected ....."
 }
 
-class TCPHandlerActor extends Actor{
+class TCPHandlerActor extends Actor with ActorLogging{
 
   val messageHandler=context.actorOf(FromConfig.props(MessageHandlerActor.props),"messageHandler")
 
   def receive:Receive={
-    case b @ Bound(localAddress) =>
-      println("connected .....")
-
+    case b @ Bound(localAddress) => {
+      println("I am here")
+      log.warning(s"hello ${b.localAddress}")
+    }
     case CommandFailed(_: Bind) => context stop self
-
-    case c @ Connected(remote, local) =>
+    case c @ Connected(remote, local) => {
       val connection = sender()
       connection ! Register(messageHandler)
-
-    case _ => println("unknown message")
+    }
   }
 }
